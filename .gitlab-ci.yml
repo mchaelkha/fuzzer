@@ -18,17 +18,8 @@ fuzzrunner:
     - cat /badchars.txt
     # An example fuzzer command. Note the url is DIFFERENT than XAMPP example (no /dvwa).
     # Remove whatever you need to.
-<<<<<<< HEAD
     # - ruby fuzz.rb discover http://localhost/ --custom-auth=dvwa
     # - ruby fuzz.rb discover http://127.0.0.1/fuzzer-tests
     - python3 fuzz.py discover http://localhost/ --custom-auth=dvwa
     - python3 fuzz.py discover http://127.0.0.1/fuzzer-tests
   stage: test
-=======
-    - ruby fuzz.rb discover http://localhost/ --custom-auth=dvwa
-    - ruby fuzz.rb discover http://127.0.0.1/fuzzer-tests
-    - python3 fuzz.py discover http://localhost/ --custom-auth=dvwa
-    - python3 fuzz.py discover http://127.0.0.1/fuzzer-tests
-  stage: test
-  
->>>>>>> af15379471ebb7f25a6ce0e68f09032fcc991cd8
