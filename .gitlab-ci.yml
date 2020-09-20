@@ -20,6 +20,7 @@ fuzzrunner:
     # Remove whatever you need to.
     # - ruby fuzz.rb discover http://localhost/ --custom-auth=dvwa
     # - ruby fuzz.rb discover http://127.0.0.1/fuzzer-tests
+    - python3 -m pip install -r requirements.txt
     - python3 fuzzer/fuzz.py discover http://localhost/ --custom-auth=dvwa
     - python3 fuzzer/fuzz.py discover http://127.0.0.1/fuzzer-tests
   stage: test
