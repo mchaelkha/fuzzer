@@ -20,5 +20,7 @@ def discover(args):
         # Change security level to low
         browser.open(urllib.parse.urljoin(args.url, '/security.php'))
         browser.select_form('form[action="#"]')
-        browser['security'] = 'high'
+        browser['security'] = 'low'
         browser.submit_selected()
+
+        print(browser.get_current_page())
