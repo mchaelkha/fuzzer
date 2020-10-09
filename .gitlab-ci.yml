@@ -12,15 +12,18 @@ before_script:
 fuzzrunner:
   script:
     # here is where you can write your commands to run your fuzzer or any custom setup commands
-    - echo "hello class"
+    # - echo "hello class"
     # need some example files for vectors and words? These are on the image
-    - cat /words.txt
-    - cat /vectors.txt
-    - cat /badchars.txt
+    # - cat /words.txt
+    # - cat /vectors.txt
+    # - cat /badchars.txt
     # An example fuzzer command. Note the url is DIFFERENT than XAMPP example (no /dvwa).
     # Remove whatever you need to.
-    - echo "Fuzzing localhost"
+    - echo "Fuzzing localhost with DVWA authentication"
     - python3 fuzzer/fuzz.py discover http://localhost/ --custom-auth=dvwa --common-words="common-words.txt" --extensions="common-extensions.txt"
+    - echo "Fuzzing localhost with default extensions and no login"
+    - python3 fuzzer/fuzz.py discover http://localhost/ --common-words=common-words.txt
     - echo "Fuzzing /fuzzer-tests"
     - python3 fuzzer/fuzz.py discover http://127.0.0.1/fuzzer-tests --common-words="common-words.txt" --extensions="common-extensions.txt"
+    - echo "Done fuzzing!"
   stage: test
