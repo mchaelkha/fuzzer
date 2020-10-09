@@ -23,12 +23,10 @@ def parser_init():
 
 if __name__ == '__main__':
     parser = parser_init()
-    parser.print_help()
     args = parser.parse_args()
-    print(args)
+    print("Starting fuzzing operations...")
     if args.command == 'discover':
-        print("discover!")
-    if args.command == 'test':
-        print("test!")
-    if args.custom_auth == 'dvwa':
+        print("Now discovering: " + args.url)
         discover.discover(args)
+    if args.command == 'test':
+        print("Now testing: " + args.url)

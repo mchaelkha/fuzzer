@@ -22,3 +22,24 @@ def discover(args):
         browser.select_form('form[action="#"]')
         browser['security'] = 'low'
         browser.submit_selected()
+
+    # Populate extensions from file or with default values
+    exts = []
+    if args.extensions:
+        with open(args.extensions) as ef:
+            for line in ef:
+                line = line.strip()
+                exts.append(line)
+    else:
+        print("Using default file extensions...")
+        exts.append('.php')
+        exts.append('')
+
+    filenames = []
+    if args.common_words:
+        with open(args.common_words) as wf:
+            for line in wf:
+                line = line.strip()
+                filenames.append(line)
+    else:
+        print("Missing common-words argument...")
