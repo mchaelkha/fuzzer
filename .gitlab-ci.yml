@@ -8,7 +8,7 @@ before_script:
   - service mysql start
   - echo '[+] Starting apache'
   - service apache2 start
-  - python3 -m pip install -r requirements.txt
+  - python3 -m pip install -q -r requirements.txt
 fuzzrunner:
   script:
     # here is where you can write your commands to run your fuzzer or any custom setup commands
@@ -19,8 +19,8 @@ fuzzrunner:
     - cat /badchars.txt
     # An example fuzzer command. Note the url is DIFFERENT than XAMPP example (no /dvwa).
     # Remove whatever you need to.
-    # - ruby fuzz.rb discover http://localhost/ --custom-auth=dvwa
-    # - ruby fuzz.rb discover http://127.0.0.1/fuzzer-tests
-    - python3 fuzzer/fuzz.py discover http://localhost/ --custom-auth=dvwa
-    - python3 fuzzer/fuzz.py discover http://127.0.0.1/fuzzer-tests
+    - echo "Fuzzing localhost"
+    - python3 fuzzer/fuzz.py discover http://localhost/ --custom-auth=dvwa --common-words="common-words.txt" --extensions="common-extensions.txt"
+    - echo "Fuzzing /fuzzer-tests"
+    - python3 fuzzer/fuzz.py discover http://127.0.0.1/fuzzer-tests --common-words="common-words.txt" --extensions="common-extensions.txt"
   stage: test

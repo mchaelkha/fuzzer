@@ -3,14 +3,32 @@ import argparse
 
 
 def parser_init():
+    main_parser = argparse.ArgumentParser(add_help=False)
+    main_parser.add_argument('--custom-auth', nargs='?', type=str)
+    main_parser.add_argument('url')
+
     parser = argparse.ArgumentParser()
-    parser.add_argument('discover', type=str)
-    parser.add_argument('url', type=str)
-    parser.add_argument('--custom-auth', required=False)
-    return parser.parse_args()
+    subparsers = parser.add_subparsers(dest='command')
+
+    discover_parser = subparsers.add_parser('discover', parents=[main_parser])
+    discover_parser.add_argument('--common-words', nargs='?', type=str, required=True)
+    discover_parser.add_argument('--extensions', nargs='?', type=str, required=False)
+
+    test_parser = subparsers.add_parser('test', parents=[main_parser])
+    test_parser.add_argument('--common-words', nargs='?', type=str, required=True)
+    test_parser.add_argument('--extensions', nargs='?', type=str, required=False)
+
+    return parser
 
 
 if __name__ == '__main__':
-    args = parser_init()
+    parser = parser_init()
+    parser.print_help()
+    args = parser.parse_args()
+    print(args)
+    if args.command == 'discover':
+        print("discover!")
+    if args.command == 'test':
+        print("test!")
     if args.custom_auth == 'dvwa':
         discover.discover(args)

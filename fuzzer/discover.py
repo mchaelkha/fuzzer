@@ -22,5 +22,3 @@ def discover(args):
         browser.select_form('form[action="#"]')
         browser['security'] = 'low'
         browser.submit_selected()
-
-        print(browser.get_current_page())
