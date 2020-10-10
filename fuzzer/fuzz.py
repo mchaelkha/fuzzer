@@ -1,5 +1,5 @@
-import discover
 import argparse
+import discover
 
 
 def parser_init():

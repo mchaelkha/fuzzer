@@ -1,19 +1,21 @@
-import mechanicalsoup
-import urllib.parse
 from collections import defaultdict
+import urllib.parse
+import mechanicalsoup
 
 line_sep = '====================\n{}'
 line_double_sep = '====================\n{}\n===================='
 space_sep = '    {}'
 
-def dvwa_auth(browser, url):
+
+def dvwa_auth(browser):
+    url = 'http://localhost/'
     # Go to setup page and reset the database
     browser.open(urllib.parse.urljoin(url, '/setup.php'))
     browser.select_form('form[action="#"]')
     browser.submit_selected()
 
     # Go to login page and login as admin
-    browser.open(url)
+    browser.open(urllib.parse.urljoin(url, '/login.php'))
     browser.select_form('form[action="login.php"]')
     browser['username'] = 'admin'
     browser['password'] = 'password'
@@ -53,14 +55,42 @@ def page_guessing(browser, url, paths, exts, pages):
     for path in paths:
         for ext in exts:
             page = url + path + ext
+            # Do not go to logout.php
+            if 'logout.php' in page:
+                continue
             resp = browser.open(page)
             if resp.status_code == 200:
                 pages.add(page)
     return pages
 
 
-def page_crawling(browser, pages):
-    pass
+def page_crawling(browser, url, pages):
+    crawl_pages = set()
+    crawl_pages.update(pages)
+    # crawl_pages.add(url + '.')
+    visited_pages = set()
+    # Begin crawl search
+    while len(crawl_pages) > 0:
+        page = crawl_pages.pop()
+        visited_pages.add(page)
+        if 'logout' in page:
+            continue
+        resp = browser.open(page)
+        if resp.soup is None:
+            pages.remove(page)
+            continue
+        links = browser.links()
+        # print("links {}".format(links))
+        for link in links:
+            href = ''
+            link_href = link.get('href')
+            if link_href.startswith('?'):
+                href = urllib.parse.urljoin(page, link_href)
+            else:
+                href = urllib.parse.urljoin(url, link_href)
+            if url in href and href not in visited_pages:
+                pages.add(href)
+                crawl_pages.add(href)
 
 
 def parse_pages(browser, pages):
@@ -85,7 +115,7 @@ def discover(args):
     browser = mechanicalsoup.StatefulBrowser()
     url = args.url
     if args.custom_auth == 'dvwa':
-        dvwa_auth(browser, url)
+        dvwa_auth(browser)
 
     # Populate extensions from file or with default values
     exts = []
@@ -109,11 +139,26 @@ def discover(args):
     page_guessing(browser, url, paths, exts, pages)
 
     # Now discover other pages from pages guessed by crawling
-    page_crawling(browser, pages)
+    page_crawling(browser, url, pages)
 
+    # Reformat links found and query parameters to a list
+    formatted = defaultdict(list)
+    for page in pages:
+        if '?' in page:
+            parts = page.split('?', 2)
+            if len(formatted[parts[0]]) >= 1:
+                formatted[parts[0]].append(parts[1])
+            else:
+                formatted[parts[0]] = parts
+        elif not formatted[page]:
+            formatted[page] = [page]
 
     print(line_double_sep.format('LINKS FOUND ON PAGE:'))
-    for page in pages:
-        print(page)
+    for page in formatted.keys():
+        query_params = formatted[page]
+        if len(query_params) > 1:
+            print(query_params)
+        else:
+            print(page)
 
     find_cookies(browser)
