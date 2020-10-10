@@ -3,3 +3,9 @@ admin
 valid
 timeout
 sensitive
+instructions
+setup
+security
+phpinfo
+about
+logout

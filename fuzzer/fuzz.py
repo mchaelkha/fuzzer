@@ -17,6 +17,10 @@ def parser_init():
     test_parser = subparsers.add_parser('test', parents=[main_parser])
     test_parser.add_argument('--common-words', nargs='?', type=str, required=True)
     test_parser.add_argument('--extensions', nargs='?', type=str, required=False)
+    test_parser.add_argument('--vectors', nargs='?', type=str, required=True)
+    test_parser.add_argument('--sanitized-chars', nargs='?', type=str, required=False)
+    test_parser.add_argument('--sensitive', nargs='?', type=str, required=True)
+    test_parser.add_argument('--slow', nargs='?', type=int, default=500, required=False)
 
     return parser
 
