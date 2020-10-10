@@ -24,6 +24,6 @@ fuzzrunner:
     - echo "Fuzzing localhost with default extensions and no login"
     - python3 fuzzer/fuzz.py discover http://localhost/ --common-words=common-words.txt
     - echo "Fuzzing /fuzzer-tests"
-    - python3 fuzzer/fuzz.py discover http://127.0.0.1/fuzzer-tests --common-words="test-words.txt" --extensions="common-extensions.txt"
+    - python3 fuzzer/fuzz.py discover http://127.0.0.1/fuzzer-tests --common-words="common-words.txt" --extensions="common-extensions.txt"
     - echo "Done fuzzing!"
   stage: test
