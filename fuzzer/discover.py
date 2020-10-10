@@ -54,7 +54,7 @@ def page_guessing(browser, url, paths, exts, pages):
         pages.add(url)
     for path in paths:
         for ext in exts:
-            page = url + path + ext
+            page = urllib.parse.urljoin(url, path + ext)
             # Do not go to logout.php
             if 'logout.php' in page:
                 continue
@@ -76,7 +76,7 @@ def page_crawling(browser, url, pages):
         if 'logout' in page:
             continue
         resp = browser.open(page)
-        if resp.soup is None:
+        if resp.soup is None or resp.status_code != 200:
             pages.remove(page)
             continue
         links = browser.links()
