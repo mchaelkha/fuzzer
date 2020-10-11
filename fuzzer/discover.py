@@ -43,10 +43,7 @@ def read_common_words(filename, paths):
 
 
 def find_cookies(browser):
-    print(line_sep.format('COOKIES'))
-    for cookie in browser.session.cookies:
-        print(space_sep.format(cookie))
-    print(line_sep.format(''))
+    return browser.session.cookies
 
 
 def page_guessing(browser, url, paths, exts, pages):
@@ -80,7 +77,6 @@ def page_crawling(browser, url, pages):
             pages.remove(page)
             continue
         links = browser.links()
-        # print("links {}".format(links))
         for link in links:
             href = ''
             link_href = link.get('href')
@@ -93,22 +89,30 @@ def page_crawling(browser, url, pages):
                 crawl_pages.add(href)
 
 
-def parse_pages(browser, pages):
-    forms = defaultdict(list)
+def input_crawling(browser, pages):
+    form_inputs = defaultdict(list)
     for page in pages:
-        """
-            1. get html
-            2. find input form fields
-            3. append to forms dict
-        """
-        pass
-    # Print inputs discovered on each page
-    print(line_double_sep.format("INPUT FORMS ON PAGES:"))
-    for page in forms.keys():
-        print(page)
-        for form in forms[page]:
-            print(space_sep.format(form))
-    return forms
+        if 'logout' in page:
+            continue
+        browser.open(page)
+        soup = browser.get_current_page()
+        form_elements = soup.find_all('form')
+        if not form_elements:
+            continue
+        h1_element = soup.find('h1')
+        page_title = ''
+        if h1_element:
+            page_title = h1_element.contents[0]
+        # print("form_inputs {}".format(form_elements))
+        for form in form_elements:
+            inputs = form.find_all('input')
+            for input in inputs:
+                if 'name' in input.attrs:
+                    # in case there is no h1 element, use the page url
+                    if not page_title:
+                        page_title = page
+                    form_inputs[page_title].append(input.attrs['name'])
+    return form_inputs
 
 
 def discover(args):
@@ -137,28 +141,50 @@ def discover(args):
     # First guess the pages
     pages = set()
     page_guessing(browser, url, paths, exts, pages)
+    guesses = set()
+    guesses.update(pages)
 
     # Now discover other pages from pages guessed by crawling
     page_crawling(browser, url, pages)
 
     # Reformat links found and query parameters to a list
-    formatted = defaultdict(list)
+    formatted_pages = defaultdict(list)
     for page in pages:
         if '?' in page:
             parts = page.split('?', 2)
-            if len(formatted[parts[0]]) >= 1:
-                formatted[parts[0]].append(parts[1])
-            else:
-                formatted[parts[0]] = parts
-        elif not formatted[page]:
-            formatted[page] = [page]
+            formatted_pages[parts[0]].append(parts[1])
+        elif not formatted_pages[page]:
+            formatted_pages[page] = []
 
+    # Now discover inputs on each page
+    form_inputs = input_crawling(browser, formatted_pages.keys())
+
+    # Print out the links guessed and discovered
     print(line_double_sep.format('LINKS FOUND ON PAGE:'))
-    for page in formatted.keys():
-        query_params = formatted[page]
-        if len(query_params) > 1:
-            print(query_params)
+    for page in formatted_pages.keys():
+        query_params = formatted_pages[page]
+        # If there exists a query parameter
+        if len(query_params) > 0:
+            print('{}, query_parameters(?=): {}'.format(page, query_params))
         else:
             print(page)
 
-    find_cookies(browser)
+    print(line_sep.format(''))
+
+    print(line_sep.format('LINKS SUCCESSFULLY GUESSED:'))
+    for guess in guesses:
+        print(guess)
+    print(line_sep.format(''))
+
+    # Print inputs discovered on each page
+    print(line_double_sep.format('INPUT FORMS ON PAGES:'))
+    for page in form_inputs.keys():
+        print(page)
+        for input in form_inputs[page]:
+            print(space_sep.format(input))
+
+    cookies = find_cookies(browser)
+    print(line_sep.format('COOKIES'))
+    for cookie in cookies:
+        print(space_sep.format(cookie))
+    print(line_sep.format(''))
