@@ -168,7 +168,7 @@ def discover(args):
         query_params = formatted_pages[page]
         # If there exists a query parameter
         if len(query_params) > 0:
-            print('{}, "query_parameters(?=)": {}'.format(page, query_params))
+            print("{}, 'query_parameters(?=)': {}".format(page, query_params))
         else:
             print(page)
 
