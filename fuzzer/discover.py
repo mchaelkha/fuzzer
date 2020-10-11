@@ -77,6 +77,7 @@ def page_crawling(browser, url, pages):
             continue
         resp = browser.open(page)
         if resp.soup is None or resp.status_code != 200:
+            pages.remove(page)
             continue
         links = browser.links()
         for link in links:
@@ -87,6 +88,7 @@ def page_crawling(browser, url, pages):
             else:
                 href = urllib.parse.urljoin(url, link_href)
             if url in href and href not in visited_pages:
+                pages.add(href)
                 crawl_pages.add(href)
 
 
