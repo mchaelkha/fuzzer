@@ -90,7 +90,7 @@ def page_crawling(browser, url, pages):
 
 
 def input_crawling(browser, pages):
-    form_inputs = defaultdict(list)
+    form_inputs = defaultdict(set)
     for page in pages:
         if 'logout' in page:
             continue
@@ -101,17 +101,17 @@ def input_crawling(browser, pages):
             continue
         h1_element = soup.find('h1')
         page_title = ''
+        # Prefer to use the h1 element otherwise the title
         if h1_element:
             page_title = h1_element.contents[0]
-        # print("form_inputs {}".format(form_elements))
+        else:
+            title_element = soup.find('title')
+            page_title = title_element.contents[0]
         for form in form_elements:
             inputs = form.find_all('input')
             for input in inputs:
                 if 'name' in input.attrs:
-                    # in case there is no h1 element, use the page url
-                    if not page_title:
-                        page_title = page
-                    form_inputs[page_title].append(input.attrs['name'])
+                    form_inputs[page_title].add(input.attrs['name'])
     return form_inputs
 
 

@@ -9,3 +9,4 @@ security
 phpinfo
 about
 logout
+login
