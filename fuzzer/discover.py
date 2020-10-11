@@ -43,7 +43,10 @@ def read_common_words(filename, paths):
 
 
 def find_cookies(browser):
-    return browser.session.cookies
+    cookies = {}
+    for cookie in browser.session.cookies:
+        cookies[cookie.name] = cookie.value
+    return cookies
 
 
 def page_guessing(browser, url, paths, exts, pages):
@@ -165,7 +168,7 @@ def discover(args):
         query_params = formatted_pages[page]
         # If there exists a query parameter
         if len(query_params) > 0:
-            print('{}, query_parameters(?=): {}'.format(page, query_params))
+            print('{}, "query_parameters(?=)": {}'.format(page, query_params))
         else:
             print(page)
 
@@ -185,6 +188,6 @@ def discover(args):
 
     cookies = find_cookies(browser)
     print(line_sep.format('COOKIES'))
-    for cookie in cookies:
-        print(space_sep.format(cookie))
+    for cookie in cookies.keys():
+        print(space_sep.format(cookie + ': ' + cookies[cookie]))
     print(line_sep.format(''))
