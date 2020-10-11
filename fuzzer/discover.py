@@ -86,7 +86,7 @@ def page_crawling(browser, url, pages):
                 href = urllib.parse.urljoin(page, link_href)
             else:
                 href = urllib.parse.urljoin(url, link_href)
-            if href not in visited_pages:
+            if url in href and href not in visited_pages:
                 crawl_pages.add(href)
 
 
