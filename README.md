@@ -13,5 +13,9 @@ SWEN-331 fuzzer project.
 	```
 	* /fuzzer-tests:
 	```sh
+<<<<<<< HEAD
 	python3 fuzzer/fuzz.py discover http://127.0.0.1/fuzzer-tests --common-words="common-words.txt" [--extensions="common-extensions.txt"]
+=======
+	python3 fuzzer/fuzz.py discover http://127.0.0.1/fuzzer-tests --common-words="common-words.txt" --[extensions="common-extensions.txt"]
+>>>>>>> c2beac80a55405d7762b6cbce7a66735e1125360
 	```
