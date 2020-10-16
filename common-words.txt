@@ -10,3 +10,12 @@ phpinfo
 about
 logout
 login
+test
+foo
+bar
+setting
+index
+home
+about
+contact
+blog
