@@ -95,13 +95,12 @@ def page_crawling(browser, url, pages):
 def input_crawling(browser, pages):
     form_inputs = defaultdict(set)
     for page in pages:
+        print(page)
         if 'logout' in page:
             continue
         browser.open(page)
         soup = browser.get_current_page()
         form_elements = soup.find_all('form')
-        if not form_elements:
-            continue
         h1_element = soup.find('h1')
         page_title = ''
         # Prefer to use the h1 element otherwise the title
@@ -110,11 +109,16 @@ def input_crawling(browser, pages):
         else:
             title_element = soup.find('title')
             page_title = title_element.contents[0]
+        if not form_elements:
+            form_inputs[page_title] = set()
+            continue
         for form in form_elements:
             inputs = form.find_all('input')
             for input in inputs:
                 if 'name' in input.attrs:
                     form_inputs[page_title].add(input.attrs['name'])
+                elif 'value' in input.attrs:
+                    form_inputs[page_title].add(input.attrs['value'])
     return form_inputs
 
 
@@ -160,7 +164,7 @@ def discover(args):
             formatted_pages[page] = []
 
     # Now discover inputs on each page
-    form_inputs = input_crawling(browser, formatted_pages.keys())
+    form_inputs = input_crawling(browser, pages)
 
     # Print out the links guessed and discovered
     print(line_double_sep.format('LINKS FOUND ON PAGE:'))
