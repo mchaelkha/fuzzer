@@ -66,7 +66,6 @@ def page_guessing(browser, url, paths, exts, pages):
 def page_crawling(browser, url, pages):
     crawl_pages = set()
     crawl_pages.update(pages)
-    # crawl_pages.add(url + '.')
     visited_pages = set()
     # Begin crawl search
     while len(crawl_pages) > 0:
@@ -106,6 +105,7 @@ def input_crawling(browser, pages):
             page_title = h1_element.contents[0]
         else:
             title_element = soup.find('title')
+            print(title_element)
             page_title = title_element.contents[0]
         if not form_elements:
             form_inputs[page_title] = set()
@@ -113,6 +113,7 @@ def input_crawling(browser, pages):
         for form in form_elements:
             inputs = form.find_all('input')
             for input in inputs:
+                # Prefer to use 'name' over 'value' if possible
                 if 'name' in input.attrs:
                     form_inputs[page_title].add(input.attrs['name'])
                 elif 'value' in input.attrs:
