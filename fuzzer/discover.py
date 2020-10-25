@@ -1,6 +1,5 @@
 from collections import defaultdict
 import urllib.parse
-import mechanicalsoup
 
 line_sep = '====================\n{}'
 line_double_sep = '====================\n{}\n===================='
@@ -95,7 +94,6 @@ def page_crawling(browser, url, pages):
 def input_crawling(browser, pages):
     form_inputs = defaultdict(set)
     for page in pages:
-        print(page)
         if 'logout' in page:
             continue
         browser.open(page)
@@ -122,8 +120,38 @@ def input_crawling(browser, pages):
     return form_inputs
 
 
-def discover(args):
-    browser = mechanicalsoup.StatefulBrowser()
+def print_formatted_output(formatted_pages, guesses, form_inputs, cookies):
+    # Print out the links guessed and discovered
+    print(line_double_sep.format('LINKS FOUND ON PAGE:'))
+    for page in formatted_pages.keys():
+        query_params = formatted_pages[page]
+        # If there exists a query parameter
+        if len(query_params) > 0:
+            print("{}, 'query_parameters(?=)': {}".format(page, query_params))
+        else:
+            print(page)
+
+    print(line_sep.format(''))
+
+    print(line_sep.format('LINKS SUCCESSFULLY GUESSED:'))
+    for guess in guesses:
+        print(guess)
+    print(line_sep.format(''))
+
+    # Print inputs discovered on each page
+    print(line_double_sep.format('INPUT FORMS ON PAGES:'))
+    for page in form_inputs.keys():
+        print(page)
+        for input in form_inputs[page]:
+            print(space_sep.format(input))
+
+    print(line_sep.format('COOKIES'))
+    for cookie in cookies.keys():
+        print(space_sep.format(cookie + ': ' + cookies[cookie]))
+    print(line_sep.format(''))
+
+
+def discover(browser, args):
     url = args.url
     if args.custom_auth == 'dvwa':
         dvwa_auth(browser)
@@ -166,32 +194,6 @@ def discover(args):
     # Now discover inputs on each page
     form_inputs = input_crawling(browser, pages)
 
-    # Print out the links guessed and discovered
-    print(line_double_sep.format('LINKS FOUND ON PAGE:'))
-    for page in formatted_pages.keys():
-        query_params = formatted_pages[page]
-        # If there exists a query parameter
-        if len(query_params) > 0:
-            print("{}, 'query_parameters(?=)': {}".format(page, query_params))
-        else:
-            print(page)
-
-    print(line_sep.format(''))
-
-    print(line_sep.format('LINKS SUCCESSFULLY GUESSED:'))
-    for guess in guesses:
-        print(guess)
-    print(line_sep.format(''))
-
-    # Print inputs discovered on each page
-    print(line_double_sep.format('INPUT FORMS ON PAGES:'))
-    for page in form_inputs.keys():
-        print(page)
-        for input in form_inputs[page]:
-            print(space_sep.format(input))
-
     cookies = find_cookies(browser)
-    print(line_sep.format('COOKIES'))
-    for cookie in cookies.keys():
-        print(space_sep.format(cookie + ': ' + cookies[cookie]))
-    print(line_sep.format(''))
+
+    return formatted_pages, guesses, form_inputs, cookies

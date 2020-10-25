@@ -1,5 +1,6 @@
 import argparse
-import discover
+import mechanicalsoup
+from discover import discover, print_formatted_output
 
 
 def parser_init():
@@ -25,15 +26,27 @@ def parser_init():
     return parser
 
 
+def discover_command(browser, args):
+    print("Now discovering: " + args.url)
+    formatted_pages, guesses, form_inputs, cookies = discover(browser, args)
+    print_formatted_output(formatted_pages, guesses, form_inputs, cookies)
+    return formatted_pages, guesses, form_inputs, cookies
+
+
+def test_command(browser, args):
+    print("Now testing: " + args.url)
+    formatted_pages, guesses, form_inputs, cookies = discover_command(browser, args)
+
+
 if __name__ == '__main__':
     parser = parser_init()
     args = parser.parse_args()
     print("Starting fuzzing operations...")
+    browser = mechanicalsoup.StatefulBrowser()
     # Make sure url ends with /
     if args.url[-1] != '/':
         args.url += '/'
     if args.command == 'discover':
-        print("Now discovering: " + args.url)
-        discover.discover(args)
-    if args.command == 'test':
-        print("Now testing: " + args.url)
+        discover_command(browser, args)
+    elif args.command == 'test':
+        test_command(browser, args)
