@@ -7,6 +7,23 @@ line_double_sep = '====================\n{}\n===================='
 space_sep = '    {}'
 
 
+def read_args(args):
+    # Populate extensions from file or with default values
+    exts = []
+    if args.extensions:
+        read_file(args.extensions, exts)
+    else:
+        print('Using default file extensions...')
+        exts.append('.php')
+        exts.append('')
+
+    # Populate paths from common_words file
+    paths = []
+    if args.common_words:
+        read_file(args.common_words, paths)
+    return exts, paths
+
+
 def dvwa_auth(browser):
     url = 'http://localhost/'
     # Go to setup page and reset the database
@@ -146,22 +163,7 @@ def discover(browser, args):
     if args.custom_auth == 'dvwa':
         dvwa_auth(browser)
 
-    # Populate extensions from file or with default values
-    exts = []
-    if args.extensions:
-        read_file(args.extensions, exts)
-    else:
-        print('Using default file extensions...')
-        exts.append('.php')
-        exts.append('')
-
-    # Populate paths from common_words file
-    paths = []
-    if args.common_words:
-        read_file(args.common_words, paths)
-    else:
-        print('Missing required common-words argument...')
-        exit(1)
+    exts, paths = read_args(args)
 
     # First guess the pages
     pages = set()
