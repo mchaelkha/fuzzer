@@ -28,7 +28,7 @@ fuzzrunner:
     - python3 fuzzer/fuzz.py discover http://127.0.0.1/fuzzer-tests --common-words="common-words.txt" --extensions="common-extensions.txt"
     - echo "Done Discovering!"
     - echo "Starting Test Command"
-    - python3 fuzzer/fuzz.py test http://localhost/ --custom-auth=dvwa --common-words=common-words.txt --extensions=common-extensions.txt --vectors=vectors.txt --sensitive=sensitive.txt"
+    - python3 fuzzer/fuzz.py test http://localhost/ --custom-auth=dvwa --common-words=common-words.txt --extensions=common-extensions.txt --vectors=vectors.txt --sensitive=sensitive.txt
     - echo "Done Testing!"
     - echo "Finished fuzzing!"
   stage: test
