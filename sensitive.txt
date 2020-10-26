@@ -1,0 +1,10 @@
+MySQL
+123-45-6789
+admin
+password
+username
+user
+Apache
+nginx
+PHP
+Version
