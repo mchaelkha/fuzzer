@@ -1,5 +1,6 @@
 from collections import defaultdict
 import urllib.parse
+from util import read_file
 
 line_sep = '====================\n{}'
 line_double_sep = '====================\n{}\n===================='
@@ -25,20 +26,6 @@ def dvwa_auth(browser):
     browser.select_form('form[action="#"]')
     browser['security'] = 'low'
     browser.submit_selected()
-
-
-def read_extensions(filename, exts):
-    with open(filename) as ef:
-        for line in ef:
-            line = line.strip()
-            exts.append(line)
-
-
-def read_common_words(filename, paths):
-    with open(filename) as wf:
-        for line in wf:
-            line = line.strip()
-            paths.append(line)
 
 
 def find_cookies(browser):
@@ -162,7 +149,7 @@ def discover(browser, args):
     # Populate extensions from file or with default values
     exts = []
     if args.extensions:
-        read_extensions(args.extensions, exts)
+        read_file(args.extensions, exts)
     else:
         print('Using default file extensions...')
         exts.append('.php')
@@ -171,7 +158,7 @@ def discover(browser, args):
     # Populate paths from common_words file
     paths = []
     if args.common_words:
-        read_common_words(args.common_words, paths)
+        read_file(args.common_words, paths)
     else:
         print('Missing required common-words argument...')
         exit(1)
