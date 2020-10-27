@@ -3,6 +3,11 @@ SWEN-331 fuzzer project.
 
 @TA I have received an extension on Part 2 to be due on 2020-10-27 @ 11:59PM.
 
+## Assumptions
+* Submitting the file upload form results in an OSError. This was counted as an HTTP response error.
+* A page and its state after submitting a possible form are two separate cases of data leakage.
+* "refresh" the page after submitting a form in case of redirects or HTML changes
+
 ## Installation
 * Run `pip install -r requirements`. This is ran in the [GitLab CI](.gitlab-ci.yml) file.
 

@@ -57,8 +57,9 @@ def check_sanitization(browser, form_inputs, sensitive_data, chars, slow):
         soup = browser.get_current_page()
         form_elements = soup.find_all('form')
         for char in chars:
-            browser.open(page)
             for form in form_elements:
+                # Refresh the page in case a redirect from the form
+                browser.open(page)
                 current_form = browser.select_form(form)
                 inputs = form.find_all('input')
                 test_phrase = phrase.format(char)
@@ -73,12 +74,15 @@ def check_sanitization(browser, form_inputs, sensitive_data, chars, slow):
                         response_count += 1
                     if resp.elapsed.total_seconds() >= slow / 1000:
                         slow_count += 1
+                    # Possibly double counts leaks, but let's keep it simple and decide that a page and
+                    # it's state after a form submission are two separate instances
                     for leak in sensitive_data:
                         if leak in resp.text:
                             leak_count += 1
                     if test_phrase in resp.text:
                         unsanitized_count += 1
                 except OSError as e:
+                    # This should count as the form request could not be submitted
                     response_count += 1
                     continue
     return unsanitized_count, leak_count, response_count, slow_count
