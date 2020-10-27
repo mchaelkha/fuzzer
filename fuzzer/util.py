@@ -7,3 +7,9 @@ def read_file(filename, arr):
         for line in f:
             line = line.strip()
             arr.append(line)
+
+def find_cookies(browser):
+    cookies = {}
+    for cookie in browser.session.cookies:
+        cookies[cookie.name] = cookie.value
+    return cookies

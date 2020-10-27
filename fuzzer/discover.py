@@ -41,13 +41,6 @@ def dvwa_auth(browser):
     browser.submit_selected()
 
 
-def find_cookies(browser):
-    cookies = {}
-    for cookie in browser.session.cookies:
-        cookies[cookie.name] = cookie.value
-    return cookies
-
-
 def page_guessing(browser, url, paths, exts, pages):
     if browser.open(url).status_code == 200:
         pages.add(url)
@@ -92,6 +85,7 @@ def page_crawling(browser, url, pages):
 
 def input_crawling(browser, pages):
     form_inputs = defaultdict(set)
+    pages_without_forms = set()
     for page in pages:
         if 'logout' in page:
             continue
@@ -102,6 +96,7 @@ def input_crawling(browser, pages):
         page_title = page.split('?')[0]
         if not form_elements:
             form_inputs[page_title] = set()
+            pages_without_forms.add(page)
             continue
         for form in form_elements:
             inputs = form.find_all('input')
@@ -111,10 +106,10 @@ def input_crawling(browser, pages):
                     form_inputs[page_title].add(input.attrs['name'])
                 elif 'value' in input.attrs:
                     form_inputs[page_title].add(input.attrs['value'])
-    return form_inputs
+    return form_inputs, pages_without_forms
 
 
-def print_formatted_output(formatted_pages, guesses, form_inputs, cookies):
+def print_discover_output(formatted_pages, guesses, form_inputs, cookies):
     # Print out the links guessed and discovered
     print(line_double_sep.format('LINKS FOUND ON PAGE:'))
     for page in formatted_pages.keys():
@@ -171,8 +166,6 @@ def discover(browser, args):
             formatted_pages[page] = []
 
     # Now discover inputs on each page
-    form_inputs = input_crawling(browser, pages)
+    form_inputs, pages_without_forms = input_crawling(browser, pages)
 
-    cookies = find_cookies(browser)
-
-    return formatted_pages, guesses, form_inputs, cookies
+    return formatted_pages, guesses, form_inputs, pages_without_forms

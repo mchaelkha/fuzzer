@@ -1,7 +1,8 @@
 import argparse
 import mechanicalsoup
-from discover import discover, print_formatted_output
-from test import test
+from discover import discover, print_discover_output
+from test import test, print_test_output
+from util import find_cookies
 
 
 def parser_init():
@@ -29,16 +30,20 @@ def parser_init():
 
 def discover_command(browser, args):
     print("Now discovering: " + args.url)
-    formatted_pages, guesses, form_inputs, cookies = discover(browser, args)
-    print_formatted_output(formatted_pages, guesses, form_inputs, cookies)
+    formatted_pages, guesses, form_inputs, pages_without_forms = discover(browser, args)
+    print_discover_output(formatted_pages, guesses, form_inputs, cookies)
+    cookies = find_cookies(browser)
     return formatted_pages, guesses, form_inputs, cookies
 
 
 def test_command(browser, args):
     print("Now testing: " + args.url)
-    formatted_pages, guesses, form_inputs, cookies = discover(browser, args)
-    # print_formatted_output(formatted_pages, guesses, form_inputs, cookies)
-    test(browser, args, form_inputs)
+    formatted_pages, guesses, form_inputs, pages_without_forms = discover(browser, args)
+    # print_discover_output(formatted_pages, guesses, form_inputs, cookies)
+    unsanitized_count, leak_count, response_count, slow_count = test(browser, args, formatted_pages, pages_without_forms, form_inputs)
+    cookies = find_cookies(browser)
+    print_discover_output(formatted_pages, guesses, form_inputs, cookies)
+    print_test_output(unsanitized_count, leak_count, response_count, slow_count)
 
 
 if __name__ == '__main__':
