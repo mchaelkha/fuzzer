@@ -24,30 +24,40 @@ def read_args(args):
     return vectors, sensitive_data, sanitized_chars, slow
 
 
-def check_pages(browser, formatted_pages, slow):
+def check_pages(browser, pages, sensitive_data, slow):
+    leak_count = 0
     response_count = 0
     slow_count = 0
-    for page in formatted_pages.keys():
-        if 'logout' in page:
-            continue
-        resp = browser.open(page)
-        if resp.elapsed.total_seconds() >= slow / 1000:
-            slow_count += 1
-        if resp.status_code != 200:
-            response_count += 1
-    return response_count, slow_count
-
-
-def check_page_leaks(browser, pages_without_forms, sensitive_data):
-    leak_count = 0
-    for page in pages_without_forms:
+    for page in pages:
         if 'logout' in page:
             continue
         resp = browser.open(page)
         for leak in sensitive_data:
             if leak in resp.text:
                 leak_count += 1
-    return leak_count
+        if resp.elapsed.total_seconds() >= slow / 1000:
+            slow_count += 1
+        if resp.status_code != 200:
+            response_count += 1
+    return leak_count, response_count, slow_count
+
+
+# def check_query_pages(browser, query_param_pages, sensitive_data, slow):
+#     leak_count = 0
+#     response_count = 0
+#     slow_count = 0
+#     for page in query_param_pages:
+#         if 'logout' in page:
+#             continue
+#         resp = browser.open(page)
+#         for leak in sensitive_data:
+#             if leak in resp.text:
+#                 leak_count += 1
+#         if resp.elapsed.total_seconds() >= slow / 1000:
+#             slow_count += 1
+#         if resp.status_code != 200:
+#             response_count += 1
+#     return leak_count, response_count, slow_count
 
 
 def check_sanitization(browser, form_inputs, sensitive_data, chars, slow):
@@ -62,8 +72,6 @@ def check_sanitization(browser, form_inputs, sensitive_data, chars, slow):
         if not form_inputs[page]:
             continue
         resp = browser.open(page)
-        if resp.elapsed.total_seconds() >= slow / 1000:
-            slow_count += 1
         soup = browser.get_current_page()
         form_elements = soup.find_all('form')
         # was_found = False
@@ -90,7 +98,7 @@ def check_sanitization(browser, form_inputs, sensitive_data, chars, slow):
                     if test_phrase in resp.text:
                         unsanitized_count += 1
                 except OSError as e:
-                    # response_count += 1
+                    response_count += 1
                     continue
     return unsanitized_count, leak_count, response_count, slow_count
 
@@ -105,7 +113,7 @@ def print_test_output(unsanitized_count, leak_count, response_count, slow_count)
     print('Number of slow responses: {}'.format(slow_count))
 
 
-def test(browser, args, formatted_pages, pages_without_forms, form_inputs):
+def test(browser, args, formatted_pages, pages, query_param_pages, form_inputs):
     vectors, sensitive_data, sanitized_chars, slow = read_args(args)
     # print(form_inputs)
     # space_sep = '    {}'
@@ -116,11 +124,16 @@ def test(browser, args, formatted_pages, pages_without_forms, form_inputs):
     total_leak_count = 0
     total_response_count = 0
     total_slow_count = 0
-    response_count, slow_count = check_pages(browser, formatted_pages, slow)
-    total_leak_count += check_page_leaks(browser, pages_without_forms, sensitive_data)
-    # total_leak_count += leak_count
+    leak_count, response_count, slow_count = check_pages(browser, pages, sensitive_data, slow)
+    total_leak_count += leak_count
     total_response_count += response_count
     total_slow_count += slow_count
+
+    # leak_count, response_count, slow_count = check_query_pages(browser, query_param_pages, sensitive_data, slow)
+    # total_leak_count += leak_count
+    # total_response_count += response_count
+    # total_slow_count += slow_count
+
     unsanitized_count, leak_count, response_count, slow_count = check_sanitization(browser, form_inputs, sensitive_data, sanitized_chars, slow)
     total_leak_count += leak_count
     total_response_count += response_count

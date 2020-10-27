@@ -30,16 +30,16 @@ def parser_init():
 
 def discover_command(browser, args):
     print("Now discovering: " + args.url)
-    formatted_pages, guesses, form_inputs, pages_without_forms = discover(browser, args)
+    formatted_pages, guesses, form_inputs, pages, query_param_pages = discover(browser, args)
     cookies = find_cookies(browser)
     print_discover_output(formatted_pages, guesses, form_inputs, cookies)
 
 
 def test_command(browser, args):
     print("Now testing: " + args.url)
-    formatted_pages, guesses, form_inputs, pages_without_forms = discover(browser, args)
+    formatted_pages, guesses, form_inputs, pages, query_param_pages = discover(browser, args)
     # print_discover_output(formatted_pages, guesses, form_inputs, cookies)
-    unsanitized_count, leak_count, response_count, slow_count = test(browser, args, formatted_pages, pages_without_forms, form_inputs)
+    unsanitized_count, leak_count, response_count, slow_count = test(browser, args, formatted_pages, pages, query_param_pages, form_inputs)
     cookies = find_cookies(browser)
     print_discover_output(formatted_pages, guesses, form_inputs, cookies)
     print_test_output(unsanitized_count, leak_count, response_count, slow_count)
