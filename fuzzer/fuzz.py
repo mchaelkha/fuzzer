@@ -31,9 +31,8 @@ def parser_init():
 def discover_command(browser, args):
     print("Now discovering: " + args.url)
     formatted_pages, guesses, form_inputs, pages_without_forms = discover(browser, args)
-    print_discover_output(formatted_pages, guesses, form_inputs, cookies)
     cookies = find_cookies(browser)
-    return formatted_pages, guesses, form_inputs, cookies
+    print_discover_output(formatted_pages, guesses, form_inputs, cookies)
 
 
 def test_command(browser, args):
