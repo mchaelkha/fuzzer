@@ -34,27 +34,26 @@ def check_sanitization(browser, form_inputs, chars):
         soup = browser.get_current_page()
         form_elements = soup.find_all('form')
         was_found = False
-
         for char in chars:
             for form in form_elements:
                 current_form = browser.select_form(form)
                 inputs = form.find_all('input')
                 test_phrase = phrase.format(char)
-                for input in inputs:
-                    current_form.set(input.attrs['name'], test_phrase)
-                submit = form.find('input', {'type': 'submit'})
-                current_form.choose_submit(submit)
-                resp = browser.submit_selected()
-                soup = browser.get_current_page()
-                was_found = False
-                for tag in soup.contents:
-                    if test_phrase in str(tag.__dict__):
+                try:
+                    for input in inputs:
+                        if 'name' in input.attrs and input.attrs['type'] != 'submit':
+                            current_form.set(input.attrs['name'], test_phrase)
+                    submit = form.find('input', {'type': 'submit'})
+                    current_form.choose_submit(submit)
+                    resp = browser.submit_selected()
+                    # print(resp.text)
+                    if test_phrase in resp.text:
+                        unsanitized_count += 1
                         was_found = True
                         break
-                if was_found:
-                    break
+                except OSError as e:
+                    continue
             if was_found:
-                unsanitized_count += 1
                 break
     return unsanitized_count
 
