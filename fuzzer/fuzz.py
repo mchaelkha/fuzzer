@@ -36,9 +36,9 @@ def discover_command(browser, args):
 
 def test_command(browser, args):
     print("Now testing: " + args.url)
-    formatted_pages, guesses, form_inputs, cookies = discover_command(browser, args)
-    print_formatted_output(formatted_pages, guesses, form_inputs, cookies)
-    test(browser, args)
+    formatted_pages, guesses, form_inputs, cookies = discover(browser, args)
+    # print_formatted_output(formatted_pages, guesses, form_inputs, cookies)
+    test(browser, args, form_inputs)
 
 
 if __name__ == '__main__':

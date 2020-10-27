@@ -102,17 +102,8 @@ def input_crawling(browser, pages):
         browser.open(page)
         soup = browser.get_current_page()
         form_elements = soup.find_all('form')
-        h1_element = soup.find('h1')
-        page_title = ''
-        # Prefer to use the h1 element otherwise the title
-        if h1_element:
-            page_title = h1_element.contents[0]
-        else:
-            title_element = soup.find('title')
-            if title_element:
-                page_title = title_element.contents[0]
-            else:
-                page_title = page
+        # Keep pages with different query parameters the same
+        page_title = page.split('?')[0]
         if not form_elements:
             form_inputs[page_title] = set()
             continue

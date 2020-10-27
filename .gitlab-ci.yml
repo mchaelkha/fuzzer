@@ -28,7 +28,12 @@ fuzzrunner:
     - python3 fuzzer/fuzz.py discover http://127.0.0.1/fuzzer-tests --common-words="common-words.txt" --extensions="common-extensions.txt"
     - echo "Done Discovering!"
     - echo "Starting Test Command"
+    - echo "Running test with specified sanitized chars"
+    - python3 fuzzer/fuzz.py test http://localhost/ --custom-auth=dvwa --common-words=common-words.txt --extensions=common-extensions.txt --vectors=vectors.txt --sensitive=sensitive.txt --sanitized-chars=sanitized-chars.txt
+    - echo "Running test with default sanitized chars"
     - python3 fuzzer/fuzz.py test http://localhost/ --custom-auth=dvwa --common-words=common-words.txt --extensions=common-extensions.txt --vectors=vectors.txt --sensitive=sensitive.txt
+    - echo "Running on fuzzer-tests with specified sanitized chars"
+    - python3 fuzzer/fuzz.py test http://localhost/fuzzer-tests --custom-auth=dvwa --common-words=common-words.txt --extensions=common-extensions.txt --vectors=vectors.txt --sensitive=sensitive.txt --sanitized-chars=sanitized-chars.txt
     - echo "Done Testing!"
     - echo "Finished fuzzing!"
   stage: test
