@@ -135,10 +135,11 @@ def print_discover_output(formatted_pages, guesses, form_inputs, cookies):
         for input in form_inputs[page]:
             print(space_sep.format(input))
 
-    print(line_sep.format('COOKIES'))
-    for cookie in cookies.keys():
-        print(space_sep.format(cookie + ': ' + cookies[cookie]))
-    print(line_sep.format(''))
+    if cookies:
+        print(line_sep.format('COOKIES'))
+        for cookie in cookies.keys():
+            print(space_sep.format(cookie + ': ' + cookies[cookie]))
+        print(line_sep.format(''))
 
 
 def discover(browser, args):
