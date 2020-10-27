@@ -5,16 +5,10 @@ def read_args(args):
     vectors = []
     if args.vectors:
         read_file(args.vectors, vectors)
-    else:
-        print('Missing required vectors argument...')
-        exit(1)
 
     sensitive_data = []
     if args.sensitive:
         read_file(args.sensitive, sensitive_data)
-    else:
-        print('Missing required sensitive argument...')
-        exit(1)
 
     sanitized_chars = []
     if args.sanitized_chars:
@@ -28,6 +22,6 @@ def read_args(args):
 
     return vectors, sensitive_data, sanitized_chars, slow
 
+
 def test(browser, args):
     vectors, sensitive_data, sanitized_chars, slow = read_args(args)
-    
