@@ -42,24 +42,6 @@ def check_pages(browser, pages, sensitive_data, slow):
     return leak_count, response_count, slow_count
 
 
-# def check_query_pages(browser, query_param_pages, sensitive_data, slow):
-#     leak_count = 0
-#     response_count = 0
-#     slow_count = 0
-#     for page in query_param_pages:
-#         if 'logout' in page:
-#             continue
-#         resp = browser.open(page)
-#         for leak in sensitive_data:
-#             if leak in resp.text:
-#                 leak_count += 1
-#         if resp.elapsed.total_seconds() >= slow / 1000:
-#             slow_count += 1
-#         if resp.status_code != 200:
-#             response_count += 1
-#     return leak_count, response_count, slow_count
-
-
 def check_sanitization(browser, form_inputs, sensitive_data, chars, slow):
     phrase = "foo{}bar"
     unsanitized_count = 0
@@ -74,9 +56,8 @@ def check_sanitization(browser, form_inputs, sensitive_data, chars, slow):
         resp = browser.open(page)
         soup = browser.get_current_page()
         form_elements = soup.find_all('form')
-        # was_found = False
         for char in chars:
-            # browser.open(page)
+            browser.open(page)
             for form in form_elements:
                 current_form = browser.select_form(form)
                 inputs = form.find_all('input')
@@ -102,8 +83,6 @@ def check_sanitization(browser, form_inputs, sensitive_data, chars, slow):
                     continue
     return unsanitized_count, leak_count, response_count, slow_count
 
-# res = browser.open(page)
-# print(res.elapsed)
 
 def print_test_output(unsanitized_count, leak_count, response_count, slow_count):
     print(line_double_sep.format(space_sep.format('TEST RESULTS')))
@@ -115,24 +94,15 @@ def print_test_output(unsanitized_count, leak_count, response_count, slow_count)
 
 def test(browser, args, formatted_pages, pages, query_param_pages, form_inputs):
     vectors, sensitive_data, sanitized_chars, slow = read_args(args)
-    # print(form_inputs)
-    # space_sep = '    {}'
-    # for page in form_inputs.keys():
-    #     print(page)
-    #     for input in form_inputs[page]:
-    #         print(space_sep.format(input))
+
     total_leak_count = 0
     total_response_count = 0
     total_slow_count = 0
+
     leak_count, response_count, slow_count = check_pages(browser, pages, sensitive_data, slow)
     total_leak_count += leak_count
     total_response_count += response_count
     total_slow_count += slow_count
-
-    # leak_count, response_count, slow_count = check_query_pages(browser, query_param_pages, sensitive_data, slow)
-    # total_leak_count += leak_count
-    # total_response_count += response_count
-    # total_slow_count += slow_count
 
     unsanitized_count, leak_count, response_count, slow_count = check_sanitization(browser, form_inputs, sensitive_data, sanitized_chars, slow)
     total_leak_count += leak_count
