@@ -1,10 +1,6 @@
 from collections import defaultdict
 import urllib.parse
-from util import read_file
-
-line_sep = '====================\n{}'
-line_double_sep = '====================\n{}\n===================='
-space_sep = '    {}'
+from util import *
 
 
 def read_args(args):
